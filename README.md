@@ -1,6 +1,6 @@
 This is the CloudFormation template for self-managed worker node creation with Multus CNI plugin in self-managed ENI mode. This mode is useful when the application wants to have a full ownership for assigning and controlling the IP address to the Pod especially for secondary subnet that is usually exposed to the external network. In this case, default K8s network interface will be still under VPC CNI plugin's control while secondary subnet ENI will be controlled by the application (e.g. IP assignment by Pod or Helm definition). 
 
-![image-20200424115637436](/Users/jungy/Library/Application Support/typora-user-images/image-20200424115637436.jpg)
+
 
 ## Automation through CloudFormation
 
