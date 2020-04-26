@@ -39,6 +39,8 @@ Metadata:
           default: Multus CNI Network Configuration
         Parameters:
           - 2ndSubnet
+          - LambdaS3Bucket
+          - LambdaS3Key
 
 Parameters:
   BootstrapArguments:
