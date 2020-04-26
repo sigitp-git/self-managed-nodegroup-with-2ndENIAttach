@@ -2,8 +2,6 @@ This is the CloudFormation template for self-managed worker node creation with M
 
 ![image-20200424115637436](image-20200424115637436.jpg)
 
-
-
 ## Pre-requisite
 This is applicable when the VPC CNI Plugin has the patch for Multus meta-CNI plugin support. 
 ﻿https://github.com/aws/amazon-vpc-cni-k8s/pull/866﻿
@@ -11,24 +9,17 @@ This is applicable when the VPC CNI Plugin has the patch for Multus meta-CNI plu
 ## Automation through CloudFormation
 
 From the baseline CFN for self-managed node group, below functions are added;
+- LifeCycle Hook Creation for the self-managed worker node group (NodeGroup).
+- Lambda function creation for ENI attach for 2ndary subnet. 
+- CloudWatch Event Rule to trigger Lambda function. 
 
-* LifeCycle Hook Creation for the NodeGroup.
-* Lambda for 2nd subnet ENI attach. 
-* CloudWatch Event Rule to trigger Lambda. 
-
-
+**Note:** Before running this CloudFormation, you have to place lambda_function zip file (lambda_function.py) to your S3 bucket. 
 
 Before running this CloudFormation, you have to place lambda_function zip file (lambda_function.py) to your S3 bucket. 
 
-
-
 During CFN stack creation, 
-
 * Select primary private subnet for the parameter of `Subets: The subnets where workers can be created.` 
-
 * Select 2ndary (Multus) subnet for the parameter of `2ndSubnet: The subnet where multus 2ndary ENI will be connected to.`
-
-
 
 After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN in Output section of the CloudFormation result. 
 
