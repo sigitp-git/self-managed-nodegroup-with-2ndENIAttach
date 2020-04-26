@@ -35,6 +35,10 @@ Metadata:
         Parameters:
           - VpcId
           - Subnets
+      - Label:
+          default: Multus CNI Network Configuration
+        Parameters:
+          - 2ndSubnet
 
 Parameters:
   BootstrapArguments:
@@ -355,11 +359,19 @@ Parameters:
 
   2ndSubnet:
     Type: "AWS::EC2::Subnet::Id"
-    Description: The subnet where multus 2ndary ENI will be connected.
+    Description: The subnet where multus 2ndary ENI will be connected to.
 
   VpcId:
     Type: "AWS::EC2::VPC::Id"
     Description: The VPC of the worker instances
+
+  LambdaS3Bucket:
+    Type: String
+    Description: Specify S3 Bucket(directory) where you locate Lambda Function
+
+  LambdaS3Key:
+    Type: String
+    Description: Specify S3 Key(filename) of your Lambda Function
 
 Conditions:
   HasNodeImageId: !Not
@@ -582,8 +594,8 @@ Resources:
       Handler: "lambda_function.lambda_handler"
       Role: !GetAtt RoleLambdaAttach2ndENI.Arn
       Code:
-        S3Bucket: "5g-lambda-function"
-        S3Key: "lambda_function.zip"
+        S3Bucket: !Ref LambdaS3Bucket
+        S3Key: !Ref LambdaS3Key
       Environment:
         Variables:
           SubnetId: !Ref 2ndSubnet
