@@ -13,18 +13,24 @@ def lambda_handler(event, context):
         instance_id = event['detail']['EC2InstanceId']
         LifecycleHookName=event['detail']['LifecycleHookName']
         AutoScalingGroupName=event['detail']['AutoScalingGroupName']
+        Index = 1
         interface_id = create_interface(os.environ['SubnetId'])
-        attachment = attach_interface(interface_id, instance_id)
-        if not interface_id:
-            complete_lifecycle_action_failure(LifecycleHookName,\
-            AutoScalingGroupName,instance_id)
-        elif not attachment:
-            complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,\
-            instance_id)
+        attachment = attach_interface(interface_id, instance_id,Index)
+        if 'subnetId2' is None:
+            interface_id2=True
+            attachment2=True
+        else:
+            Index = Index+1
+            interface_id2 = create_interface(os.environ['SubnetId2'])
+            attachment2 = attach_interface(interface_id2, instance_id,Index)
+
+        if not interface_id or not interface_id2:
+            complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,instance_id)
+        elif not attachment or not attachment2:
+            complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,instance_id)
             delete_interface(interface_id)
         else:
-            complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,\
-            instance_id)
+            complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,instance_id)
 
 
 def get_subnet_id(instance_id):
@@ -52,14 +58,14 @@ def create_interface(subnet_id):
     return network_interface_id
 
 
-def attach_interface(network_interface_id, instance_id):
+def attach_interface(network_interface_id, instance_id, index):
     attachment = None
     if network_interface_id and instance_id:
         try:
             attach_interface = ec2_client.attach_network_interface(
                 NetworkInterfaceId=network_interface_id,
                 InstanceId=instance_id,
-                DeviceIndex=1
+                DeviceIndex=index
             )
             attachment = attach_interface['AttachmentId']
             log("Created network attachment: {}".format(attachment))
