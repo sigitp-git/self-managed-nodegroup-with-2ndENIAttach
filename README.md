@@ -10,7 +10,7 @@ This is applicable when the VPC CNI Plugin has the patch for Multus meta-CNI plu
 
 From the baseline CFN for self-managed node group, below functions are added;
 - LifeCycle Hook creation for the self-managed worker node group (NodeGroup).
-- Lambda function creation for ENI attach for 2ndary subnet (using the code (in zip file) pre-uploaded in S3). 
+- Lambda function creation for ENI attachment of 2ndary subnet (using the code (in zip file) pre-uploaded in S3). Current Lambda can support max 2 secondary subnets to be attached. 
 - CloudWatch Event Rule to trigger Lambda function. 
 
 **Note:** Before running this CloudFormation, you have to place lambda_function zip file (lambda_function.py) to your S3 bucket. 
