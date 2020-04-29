@@ -366,7 +366,6 @@ Parameters:
 
   AuxSubnet2:
     Type: "AWS::EC2::Subnet::Id"
-    Default: ""
     Description: The subnet2 where multus 2ndary ENI will be connected to.
 
   VpcId:
