@@ -14,15 +14,17 @@ def lambda_handler(event, context):
         LifecycleHookName=event['detail']['LifecycleHookName']
         AutoScalingGroupName=event['detail']['AutoScalingGroupName']
         Index = 1
-        interface_id = create_interface(os.environ['SubnetId'])
-        attachment = attach_interface(interface_id, instance_id,Index)
-        if 'subnetId2' is None:
+        subnetid1 = os.environ['SubnetId']
+        subnetid2 = os.environ['SubnetId2']
+        interface_id = create_interface(subnetid1)
+        attachment = attach_interface(interface_id,instance_id,Index)
+        if subnetid2 == 'None':
             interface_id2=True
             attachment2=True
         else:
             Index = Index+1
-            interface_id2 = create_interface(os.environ['SubnetId2'])
-            attachment2 = attach_interface(interface_id2, instance_id,Index)
+            interface_id2 = create_interface(subnetid2)
+            attachment2 = attach_interface(interface_id2,instance_id,Index)
 
         if not interface_id or not interface_id2:
             complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,instance_id)
