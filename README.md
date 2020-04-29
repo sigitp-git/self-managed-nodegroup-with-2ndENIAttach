@@ -4,7 +4,7 @@ This is the CloudFormation template for self-managed worker node creation with M
 
 ## Pre-requisite
 This is applicable when the VPC CNI Plugin has the patch for Multus meta-CNI plugin support. 
-﻿https://github.com/aws/amazon-vpc-cni-k8s/pull/866﻿
+﻿https://github.com/aws/amazon-vpc-cni-k8s/pull/866 ﻿
 
 ## Automation through CloudFormation
 
