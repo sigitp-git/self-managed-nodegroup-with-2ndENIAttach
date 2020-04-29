@@ -36,7 +36,7 @@ Metadata:
           - VpcId
           - Subnets
       - Label:
-          default: Multus CNI Network Configuration
+          default: Multus CNI Configuration
         Parameters:
           - 2ndSubnet
           - LambdaS3Bucket
@@ -601,6 +601,7 @@ Resources:
       Environment:
         Variables:
           SubnetId: !Ref 2ndSubnet
+          SubnetId2: 'None'
 # End of Lambda
 
 # CloudWatch Event Trigger
