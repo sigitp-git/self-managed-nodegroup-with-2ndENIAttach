@@ -26,3 +26,7 @@ After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN i
 **Terminate** all existing instances to make the Event rule and Lambda to be effective to new workers. 
 
 If you use default EKS optimized AMI, since this package doesn't have netutils package, newly added ENI (eth1) doesn't get added to the kernel automatically. So, you have to login workernode and you have to try "sudo ifconfig eth up" once.  
+
+## Extra note for the number of additioanl subnets
+
+If workernode has to be attached with 2 additional subnets other than default k8s network, then `amazon-eks-nodegroup-2nd-2ENIs.yaml` CFN can be used. Current Lambda supports max 2 additional subnets attachment to the worker node group. 
