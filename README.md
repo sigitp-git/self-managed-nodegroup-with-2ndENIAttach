@@ -32,5 +32,13 @@ After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN i
 **Note** If you use default EKS optimized AMI, since this package doesn't have netutils package, newly added ENI (eth1) doesn't get added to the kernel automatically. So, you have to login workernode and you have to try "sudo ifconfig eth up" once.  
 
 ## Extra note for the number of additioanl subnets
+Based on required number of multus subnets, user can use different CFNs in this GitHub with same Lambda function.
+- amazon-eks-nodegroup-multus-1ENIs.yaml : 1 multus subnet
+- amazon-eks-nodegroup-multus-2ENIs.yaml : 2 multus subnets
+- amazon-eks-nodegroup-multus-4ENIs.yaml : 4 multus subnets
 
-If workernode has to be attached with 2 additional subnets other than default k8s network, then `amazon-eks-nodegroup-2nd-2ENIs.yaml` CFN can be used. Current Lambda supports max 2 additional subnets attachment to the worker node group. 
+## Release Note 
+- 5/3/2020: 
+  . Lambda function updated to support Life-cycle hook termination action to clean up orphan ENIs after workernode termination
+  . CFN function updated to support auto-termination for instances created before Lambda kicks in. 
+  . Different CFNs for each multus subnet case are added.
