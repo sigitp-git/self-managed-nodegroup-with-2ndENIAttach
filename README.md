@@ -23,7 +23,7 @@ Before running this CloudFormation, you have to place lambda_function zip file (
 
 During CFN stack creation, 
 * Select primary private subnet for the parameter of `Subets: The subnets where workers can be created.` 
-* Select 2ndary (Multus) subnet for the parameter of `2ndSubnet: The subnet where multus 2ndary ENI will be connected to.`
+* Select 2ndary (Multus) subnet for the parameter of `MultusSubnet1/2/3/4: The subnet where multus ENIs will be connected to.`
 
 After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN in Output section of the CloudFormation result. 
 
