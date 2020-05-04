@@ -33,7 +33,7 @@ After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN i
 
 ## Extra note for the number of additioanl subnets
 Based on required number of multus subnets, user can use different CFNs in this GitHub with same Lambda function.
-- amazon-eks-nodegroup-multus-1ENIs.yaml : 1 multus subnet
+- amazon-eks-nodegroup-multus-1ENI.yaml : 1 multus subnet
 - amazon-eks-nodegroup-multus-2ENIs.yaml : 2 multus subnets
 - amazon-eks-nodegroup-multus-4ENIs.yaml : 4 multus subnets
 
