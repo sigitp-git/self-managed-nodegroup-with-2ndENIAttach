@@ -27,11 +27,11 @@ During CFN stack creation,
 
 After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN in Output section of the CloudFormation result. 
 
-**Update 5/3** CFN is updated now to take auto-termination of existing workernodes which created before Lambda function kicks in, using Lambda-backed Custom Resource of CFN. 
+**Update 5/3:** CFN is updated now to take auto-termination of existing workernodes which created before Lambda function kicks in, using Lambda-backed Custom Resource of CFN. 
 
-**Note** If you use default EKS optimized AMI, since this package doesn't have netutils package, newly added ENI (eth1) doesn't get added to the kernel automatically. So, you have to login workernode and you have to try "sudo ifconfig eth up" once.  
+**Note:** If you use default EKS optimized AMI, since this package doesn't have netutils package, newly added ENI (eth1) doesn't get added to the kernel automatically. So, you have to login workernode and you have to try "sudo ifconfig eth up" once.  
 
-## Extra note for the number of additioanl subnets
+## List of CFNs
 Based on required number of multus subnets, user can use different CFNs in this GitHub with same Lambda function.
 - amazon-eks-nodegroup-multus-1ENI.yaml : 1 multus subnet
 - amazon-eks-nodegroup-multus-2ENIs.yaml : 2 multus subnets
