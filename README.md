@@ -39,6 +39,6 @@ Based on required number of multus subnets, user can use different CFNs in this 
 
 ## Release Note 
 * 5/3/2020: 
-..* Lambda function updated to support Life-cycle hook termination action to clean up orphan ENIs after workernode termination
-..* CFN function updated to support auto-termination for instances created before Lambda kicks in. 
-..* Different CFNs for each multus subnet case are added.
+  * Lambda function updated to support Life-cycle hook termination action to clean up orphan ENIs after workernode termination
+  * CFN function updated to support auto-termination for instances created before Lambda kicks in. 
+  * Different CFNs for each multus subnet case are added.
