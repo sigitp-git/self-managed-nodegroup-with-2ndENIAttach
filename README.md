@@ -7,7 +7,7 @@ This is the CloudFormation template for self-managed worker node creation with M
 ﻿https://github.com/aws/amazon-vpc-cni-k8s/pull/866 ﻿
 - This CFN assumes user already created subnets for Multus interfaces as needed. 
 - Current Lambda supports maximum 4 additional multus subnets (besides with a default K8s network). 
-- **Important** User must be aware of and responsible of that using this CFN and this mode of multus will cause the number of pods hosted on the workernode to be reduced down because this mode is dedicating certain number of ENIs only for Multus subnet purpose. (In general, a number of max Pods on the node has tight dependancy to the number of ENIs available for VPC CNI plugin.)
+- **[Important Note]** *User must be aware of and responsible of that using this CFN and this mode of multus will cause the number of pods hosted on the workernode to be reduced down because this mode is dedicating certain number of ENIs only for Multus subnet purpose. (In general, a number of max Pods on the node has tight dependancy to the number of ENIs available for VPC CNI plugin.)*
 
 ## Automation through CloudFormation
 
