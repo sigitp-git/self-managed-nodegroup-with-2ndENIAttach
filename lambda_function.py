@@ -7,32 +7,91 @@ ec2_client = boto3.client('ec2')
 asg_client = boto3.client('autoscaling')
 ec2 = boto3.resource('ec2')
 
-
 def lambda_handler(event, context):
-    if event["detail-type"] == "EC2 Instance-launch Lifecycle Action":
-        instance_id = event['detail']['EC2InstanceId']
-        LifecycleHookName=event['detail']['LifecycleHookName']
-        AutoScalingGroupName=event['detail']['AutoScalingGroupName']
-        Index = 1
-        subnetid1 = os.environ['SubnetId']
-        subnetid2 = os.environ['SubnetId2']
-        interface_id = create_interface(subnetid1)
-        attachment = attach_interface(interface_id,instance_id,Index)
-        if subnetid2 == 'None':
-            interface_id2=True
-            attachment2=True
-        else:
-            Index = Index+1
-            interface_id2 = create_interface(subnetid2)
-            attachment2 = attach_interface(interface_id2,instance_id,Index)
+    instance_id = event['detail']['EC2InstanceId']
+    LifecycleHookName=event['detail']['LifecycleHookName']
+    AutoScalingGroupName=event['detail']['AutoScalingGroupName']
+    subnetEnvs = [os.environ['SubnetId1'], os.environ['SubnetId2'], os.environ['SubnetId3'], os.environ['SubnetId4']]
+    subnetids = []
 
-        if not interface_id or not interface_id2:
-            complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,instance_id)
-        elif not attachment or not attachment2:
-            complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,instance_id)
-            delete_interface(interface_id)
+    for n in range (4):
+        if subnetEnvs[n] != "":
+            subnetids.append(subnetEnvs[n])
         else:
-            complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,instance_id)
+            break
+
+    if event["detail-type"] == "EC2 Instance-launch Lifecycle Action":
+        index = 1
+        for x in subnetids:
+            interface_id = create_interface(x)
+            attachment = attach_interface(interface_id,instance_id,index)
+            index = index+1
+            if not interface_id:
+                complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,instance_id)
+                return
+            elif not attachment:
+                complete_lifecycle_action_failure(LifecycleHookName,AutoScalingGroupName,instance_id)
+                delete_interface(interface_id)
+                return
+        complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,instance_id)
+
+    if event["detail-type"] == "EC2 Instance-terminate Lifecycle Action":
+        interface_ids = []
+        attachment_ids = []
+
+        response = ec2_client.describe_network_interfaces(
+            Filters=[
+                {
+                    'Name':'subnet-id',
+                    'Values': subnetids
+                },
+                {
+                    'Name':'attachment.instance-id',
+                    'Values': [
+                        instance_id
+                    ]
+                },
+            ],
+        )
+
+        target_delete = 0
+        for i in response['NetworkInterfaces']:
+            interface_ids.append(i['NetworkInterfaceId'])
+            attachment_ids.append(i['Attachment']['AttachmentId'])
+            target_delete = target_delete+1
+        log("number interface to detach and delete from terminating instance: {}".format(target_delete))
+
+        if target_delete != 0:
+            for j in attachment_ids:
+                try:
+                    detach_interface(j)
+                except botocore.exceptions.ClientError as e:
+                    log("Error detaching network interface: {}".format(e.response['Error']))
+
+            waiter = ec2_client.get_waiter("network_interface_available")
+            waiter.wait(NetworkInterfaceIds=interface_ids)
+
+            for k in interface_ids:
+                try:
+                    delete_interface(k)
+                except botocore.exceptions.ClientError as e:
+                    log("Error deleting network interface: {}".format(e.response['Error']))
+        else:
+            log("No net-intf to delete")
+        complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,instance_id)
+
+def detach_interface(attachment_id):
+    try:
+        ec2_client.detach_network_interface(
+            AttachmentId=attachment_id,
+            DryRun=False,
+            Force=True
+        )
+        log("Detach network interface: {}".format(attachment_id))
+        return True
+    except botocore.exceptions.ClientError as e:
+        log("Error detaching interface {}: {}".format(attachment_id,e.response['Error']))
+
 
 
 def get_subnet_id(instance_id):
