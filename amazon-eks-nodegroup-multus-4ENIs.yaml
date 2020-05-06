@@ -663,7 +663,6 @@ Resources:
   LambdaReStartFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: Restarter
       Code:
         ZipFile: |
           import boto3, json
