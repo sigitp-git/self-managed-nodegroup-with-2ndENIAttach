@@ -1,7 +1,6 @@
 This is the CloudFormation template for self-managed worker node creation with Multus CNI plugin in EKS. This mode is useful when the application wants to have a full ownership for assigning and controlling the IP address to the Pod especially for secondary subnet that is usually exposed to the external network. In this case, default K8s network interface will be still under VPC CNI plugin's control while secondary subnet ENI will be controlled by the application (e.g. IP assignment by Pod or Helm definition). 
 
-
-
+![image-20200518231006033](image-20200518231006033.jpg)
 ## Pre-requisite
 - This CFN assumes user already created subnets for Multus interfaces as needed. 
 - Current Lambda supports maximum 4 additional multus subnets (besides with a default K8s network). 
