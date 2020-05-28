@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+WSTemplateFormatVersion: "2010-09-09"
 
 Description: Amazon EKS - Node Group
 
@@ -86,7 +86,7 @@ Parameters:
 
   NodeImageIdSSMParam:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
-    Default: /aws/service/eks/optimized-ami/1.15/amazon-linux-2/recommended/image_id
+    Default: /aws/service/eks/optimized-ami/1.16/amazon-linux-2/recommended/image_id
     Description: AWS Systems Manager Parameter Store parameter of the AMI ID for the worker node instances.
 
   NodeInstanceType:
@@ -400,6 +400,26 @@ Resources:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
       Path: /
 
+# NodeRole for EC2 API Call
+  Ec2ApiAccessPolicy:
+    Type: "AWS::IAM::Policy"
+    DependsOn: NodeInstanceRole
+    Properties:
+      PolicyName: Ec2ApiAccessPolicy
+      Roles: [
+          !Ref NodeInstanceRole
+        ]
+      PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: [
+                "ec2:AssignPrivateIpAddresses",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeSubnets"
+              ]
+              Resource: "*"
+
   NodeInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -485,7 +505,7 @@ Resources:
   NodeLaunchConfig:
     Type: "AWS::AutoScaling::LaunchConfiguration"
     Properties:
-      AssociatePublicIpAddress: "true"
+      AssociatePublicIpAddress: "false"
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
@@ -578,6 +598,7 @@ Resources:
                 "ec2:CreateNetworkInterface",
                 "ec2:DescribeInstances",
                 "ec2:DetachNetworkInterface",
+                "ec2:ModifyNetworkInterfaceAttribute",
                 "autoscaling:CompleteLifecycleAction",
                 "ec2:DeleteTags",
                 "ec2:DescribeNetworkInterfaces",
