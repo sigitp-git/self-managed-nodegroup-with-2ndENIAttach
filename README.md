@@ -39,3 +39,9 @@ Based on required number of multus subnets, user can use different CFNs in this 
   * Lambda function updated to support Life-cycle hook termination action to clean up orphan ENIs after workernode termination
   * CFN function updated to support auto-termination for instances created before Lambda kicks in. 
   * Different CFNs for each multus subnet case are added.
+
+* 5/28/2020
+  * Lambda updated: Network attribute changed for multus interface - DeleteOnTerminatino=True, SrcDstCheck=False
+  * CFN updated with: 
+    * publicIpAddress assign in LaunchConfiguration to be false (along with 1.16 change)
+    * Base AMI version changed to be 1.16
