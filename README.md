@@ -45,3 +45,4 @@ Based on required number of multus subnets, user can use different CFNs in this 
   * CFN updated with: 
     * publicIpAddress assign in LaunchConfiguration to be false (along with 1.16 change)
     * Base AMI version changed to be 1.16
+  * Sample python codes added for "Floating IP" implementation IpUpdate.py and Ipv6.py
