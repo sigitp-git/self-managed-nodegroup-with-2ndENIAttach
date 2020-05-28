@@ -39,45 +39,8 @@ def lambda_handler(event, context):
         interface_ids = []
         attachment_ids = []
 
-        response = ec2_client.describe_network_interfaces(
-            Filters=[
-                {
-                    'Name':'subnet-id',
-                    'Values': subnetids
-                },
-                {
-                    'Name':'attachment.instance-id',
-                    'Values': [
-                        instance_id
-                    ]
-                },
-            ],
-        )
+        # -* K8s draining function should be added here -*#
 
-        target_delete = 0
-        for i in response['NetworkInterfaces']:
-            interface_ids.append(i['NetworkInterfaceId'])
-            attachment_ids.append(i['Attachment']['AttachmentId'])
-            target_delete = target_delete+1
-        log("number interface to detach and delete from terminating instance: {}".format(target_delete))
-
-        if target_delete != 0:
-            for j in attachment_ids:
-                try:
-                    detach_interface(j)
-                except botocore.exceptions.ClientError as e:
-                    log("Error detaching network interface: {}".format(e.response['Error']))
-
-            waiter = ec2_client.get_waiter("network_interface_available")
-            waiter.wait(NetworkInterfaceIds=interface_ids)
-
-            for k in interface_ids:
-                try:
-                    delete_interface(k)
-                except botocore.exceptions.ClientError as e:
-                    log("Error deleting network interface: {}".format(e.response['Error']))
-        else:
-            log("No net-intf to delete")
         complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,instance_id)
 
 def detach_interface(attachment_id):
@@ -142,6 +105,20 @@ def attach_interface(network_interface_id, instance_id, index):
             }
         ]
     )
+
+    #modify_attribute doesn't allow multiple parameter change at once..
+    network_interface.modify_attribute(
+        SourceDestCheck={
+            'Value': False
+        }
+    )
+    network_interface.modify_attribute(
+        Attachment={
+            'AttachmentId': attachment,
+            'DeleteOnTermination': True
+        },
+    )
+
     return attachment
 
 
