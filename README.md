@@ -47,3 +47,8 @@ Based on required number of multus subnets, user can use different CFNs in this 
     * publicIpAddress assign in LaunchConfiguration to be false (along with 1.16 change)
     * Base AMI version changed to be 1.16
   * Sample python codes added for "Floating IP" implementation IpUpdate.py and Ipv6.py
+
+* 5/29/2020
+  * Reflected user request (Security Group to be specified at NetworkInterface creation)
+    * CFN gets new parmaeter SecurityGroupId 
+    * Lambda gets new environment variable SecurityGroupId, and use this for create_network_interface
