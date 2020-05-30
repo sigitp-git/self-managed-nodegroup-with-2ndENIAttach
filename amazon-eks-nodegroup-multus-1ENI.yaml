@@ -39,6 +39,7 @@ Metadata:
           default: Multus CNI Configuration
         Parameters:
           - MultusSubnet1
+          - MultusSecurityGroupId
           - LambdaS3Bucket
           - LambdaS3Key
 
@@ -363,6 +364,10 @@ Parameters:
     Type: "AWS::EC2::Subnet::Id"
     Description: The subnet where multus 2ndary ENI will be connected to.
 
+  MultusSecurityGroupId:
+    Type: "AWS::EC2::SecurityGroup::Id"
+    Description: The combined security group of the Multus Network Interfaces. Select one from the list.
+
   VpcId:
     Type: "AWS::EC2::VPC::Id"
     Description: The VPC of the worker instances
@@ -398,6 +403,7 @@ Resources:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEKSWorkerNodePolicy"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEKS_CNI_Policy"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AWSCloudFormationFullAccess"
       Path: /
 
 # NodeRole for EC2 API Call
@@ -416,7 +422,8 @@ Resources:
               Action: [
                 "ec2:AssignPrivateIpAddresses",
                 "ec2:DescribeNetworkInterfaces",
-                "ec2:DescribeSubnets"
+                "ec2:DescribeSubnets",
+                "ec2:ModifyInstanceAttribute"
               ]
               Resource: "*"
 
@@ -530,6 +537,14 @@ Resources:
                    --stack  ${AWS::StackName} \
                    --resource NodeGroup  \
                    --region ${AWS::Region}
+          echo "net.ipv4.conf.default.rp_filter = 0" | tee -a /etc/sysctl.conf
+          echo "net.ipv4.conf.all.rp_filter = 0" | tee -a /etc/sysctl.conf
+          sudo sysctl -p
+          sleep 45
+          ls /sys/class/net/ > /tmp/ethList;cat /tmp/ethList |while read line ; do sudo ifconfig $line up; done
+          grep eth /tmp/ethList |while read line ; do echo "ifconfig $line up" >> /etc/rc.d/rc.local; done
+          systemctl enable rc-local
+          chmod +x /etc/rc.d/rc.local
 
   NodeGroup:
     Type: "AWS::AutoScaling::AutoScalingGroup"
@@ -635,6 +650,7 @@ Resources:
           SubnetId2: ''
           SubnetId3: ''
           SubnetId4: ''
+          SecGroupId: !Ref MultusSecurityGroupId
 # End of Lambda
 
 # CloudWatch Event Trigger
@@ -701,6 +717,7 @@ Resources:
 
   CustomResource:
     Type: Custom::CustomResource
+    DependsOn: NodeGroup
     Properties:
       ServiceToken: !GetAtt 'LambdaReStartFunction.Arn'
       AsgName: !Ref NodeGroup
