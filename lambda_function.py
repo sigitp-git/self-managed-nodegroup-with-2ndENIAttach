@@ -12,6 +12,7 @@ def lambda_handler(event, context):
     LifecycleHookName=event['detail']['LifecycleHookName']
     AutoScalingGroupName=event['detail']['AutoScalingGroupName']
     subnetEnvs = [os.environ['SubnetId1'], os.environ['SubnetId2'], os.environ['SubnetId3'], os.environ['SubnetId4']]
+    secgroup_id = os.environ['SecGroupId']
     subnetids = []
 
     for n in range (4):
@@ -23,7 +24,7 @@ def lambda_handler(event, context):
     if event["detail-type"] == "EC2 Instance-launch Lifecycle Action":
         index = 1
         for x in subnetids:
-            interface_id = create_interface(x)
+            interface_id = create_interface(x,secgroup_id)
             attachment = attach_interface(interface_id,instance_id,index)
             index = index+1
             if not interface_id:
@@ -70,11 +71,11 @@ def get_subnet_id(instance_id):
     return vpc_subnet_id
 
 
-def create_interface(subnet_id):
+def create_interface(subnet_id,sg_id):
     network_interface_id = None
     if subnet_id:
         try:
-            network_interface = ec2_client.create_network_interface(SubnetId=subnet_id)
+            network_interface = ec2_client.create_network_interface(Groups=[sg_id],SubnetId=subnet_id)
             network_interface_id = network_interface['NetworkInterface']['NetworkInterfaceId']
             log("Created network interface: {}".format(network_interface_id))
         except botocore.exceptions.ClientError as e:
