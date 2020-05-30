@@ -42,6 +42,7 @@ Metadata:
           - MultusSubnet2
           - MultusSubnet3
           - MultusSubnet4
+          - MultusSecurityGroupId
           - LambdaS3Bucket
           - LambdaS3Key
 
@@ -94,7 +95,7 @@ Parameters:
 
   NodeInstanceType:
     Type: String
-    Default: t3.medium
+    Default: c5.4xlarge
     AllowedValues:
       - a1.medium
       - a1.large
@@ -378,6 +379,10 @@ Parameters:
     Type: "AWS::EC2::Subnet::Id"
     Description: The subnet2 where multus 2ndary ENI will be connected to.
 
+  MultusSecurityGroupId:
+    Type: "AWS::EC2::SecurityGroup::Id"
+    Description: The combined security group of the Multus Network Interfaces. Select one from the list.
+
   VpcId:
     Type: "AWS::EC2::VPC::Id"
     Description: The VPC of the worker instances
@@ -413,6 +418,7 @@ Resources:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEKSWorkerNodePolicy"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEKS_CNI_Policy"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AWSCloudFormationFullAccess"
       Path: /
 
 # NodeRole for EC2 API Call
@@ -431,7 +437,8 @@ Resources:
               Action: [
                 "ec2:AssignPrivateIpAddresses",
                 "ec2:DescribeNetworkInterfaces",
-                "ec2:DescribeSubnets"
+                "ec2:DescribeSubnets",
+                "ec2:ModifyInstanceAttribute"
               ]
               Resource: "*"
 
@@ -650,6 +657,7 @@ Resources:
           SubnetId2: !Ref MultusSubnet2
           SubnetId3: !Ref MultusSubnet3
           SubnetId4: !Ref MultusSubnet4
+          SecGroupId: !Ref MultusSecurityGroupId
 # End of Lambda
 
 # CloudWatch Event Trigger
@@ -716,6 +724,7 @@ Resources:
 
   CustomResource:
     Type: Custom::CustomResource
+    DependsOn: NodeGroup
     Properties:
       ServiceToken: !GetAtt 'LambdaReStartFunction.Arn'
       AsgName: !Ref NodeGroup
