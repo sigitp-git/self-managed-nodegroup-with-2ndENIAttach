@@ -34,8 +34,8 @@ Based on required number of multus subnets, user can use different CFNs in this 
  - subnets : default K8s networking subnet (only one)
  - multus sunbet1/2/3/4: subnet IDs for Multus interfaces
  - multus security group: security group applied to multus interfaces
- - Lambda Key: `my-lambda-multus`
- - Lambda Object: `lambda_function.zip`
+ - Lambda Bucket: `my-lambda-multus`
+ - Lambda Key: `lambda_function.zip`
  - Add NodeGroupRole ARN from CFN Output to aws-auth-cm.yaml and apply this to your EKS cluster
 
 ## Release Note 
