@@ -14,15 +14,8 @@ From the baseline CFN for self-managed node group, below functions are added;
 - CloudWatch Event Rule to trigger Lambda function. 
 - MultusSubnet1/2/3/4 parameters of CFN should be configured properly along with the number of multus subnet desired. 
 
-**Note:** Before running this CloudFormation, you have to place lambda_function zip file (lambda_function.py) to your S3 bucket. 
-
+**Note:** 
 Before running this CloudFormation, you have to place lambda_function zip file (lambda_function.py) to your S3 bucket. 
-
-During CFN stack creation, 
-* Select primary private subnet for the parameter of `Subets: The subnets where workers can be created.` 
-* Select 2ndary (Multus) subnet for the parameter of `MultusSubnet1/2/3/4: The subnet where multus ENIs will be connected to.`
-
-After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN in Output section of the CloudFormation result. 
 
 **Update 5/3:** CFN is updated now to take auto-termination of existing workernodes which created before Lambda function kicks in, using Lambda-backed Custom Resource of CFN. 
 
@@ -43,6 +36,7 @@ Based on required number of multus subnets, user can use different CFNs in this 
  - multus security group: security group applied to multus interfaces
  - Lambda Key: `my-lambda-multus`
  - Lambda Object: `lambda_function.zip`
+ - Add NodeGroupRole ARN from CFN Output to aws-auth-cm.yaml and apply this to your EKS cluster
 
 ## Release Note 
 * 5/3/2020: 
