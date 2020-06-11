@@ -35,6 +35,15 @@ Based on required number of multus subnets, user can use different CFNs in this 
 - amazon-eks-nodegroup-multus-3ENIs.yaml : 3 multus subnets
 - amazon-eks-nodegroup-multus-4ENIs.yaml : 4 multus subnets
 
+## How to use
+- Download lambda_function.py file and zip it to `lambda_function.zip`, then locate it to your S3 bucket `my-lambda-multus`
+- Download CFN (according to the demand how many multus interfaces required), and use this for CloudFormation stack creation. In stack creation, set parameters like,
+ - subnets : default K8s networking subnet (only one)
+ - multus sunbet1/2/3/4: subnet IDs for Multus interfaces
+ - multus security group: security group applied to multus interfaces
+ - Lambda Key: `my-lambda-multus`
+ - Lambda Object: `lambda_function.zip`
+
 ## Release Note 
 * 5/3/2020: 
   * Lambda function updated to support Life-cycle hook termination action to clean up orphan ENIs after workernode termination
